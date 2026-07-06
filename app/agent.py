@@ -214,8 +214,7 @@ def final_output(ctx: Context, node_input: dict) -> Event:
 
 edges = [
     (START, security_checkpoint),
-    (security_checkpoint, ceo, "pass"),
-    (security_checkpoint, security_event, "SECURITY_EVENT"),
+    (security_checkpoint, {"pass": ceo, "SECURITY_EVENT": security_event}),
     (ceo, human_review),
     (human_review, final_output),
 ]
