@@ -162,6 +162,7 @@ def security_event(node_input: str) -> Event:
     yield Event(output=node_input)
 
 
+@node(rerun_on_resume=True)
 async def run_ceo_with_retry(ctx: Context, node_input: str) -> Event:
     """Wrapper node for executing the CEO orchestrator with backoff retry logic on API errors."""
     max_retries = 5
@@ -169,9 +170,9 @@ async def run_ceo_with_retry(ctx: Context, node_input: str) -> Event:
 
     for attempt in range(max_retries):
         try:
-            # Execute the CEO agent and yield its events (streaming tokens, status)
-            async for event in ceo.run_async(node_input, ctx=ctx):
-                yield event
+            # Run the CEO orchestrator node using run_node
+            ceo_output = await ctx.run_node(ceo, node_input=node_input)
+            yield Event(output=ceo_output)
             return  # Success, exit the retry loop
         except Exception as e:
             # If it is the last attempt, fail gracefully and display error
